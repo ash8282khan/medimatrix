@@ -21,7 +21,7 @@ import {
   AccountCircle,
   ExitToApp,
 } from '@mui/icons-material';
-import { Line } from 'react-chartjs-2'; 
+import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -35,8 +35,7 @@ import InventoryOverview from '../inventory/InventoryOverview';
 import OrderListPage from '../orders/OrderListPage';
 import NewOrderPage from '../orders/NewOrderPage';
 import TrackShipmentPage from '../shipments/TrackShipmentPage';
-
-
+import logo from '../../assets/logo.png';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
@@ -46,7 +45,7 @@ export default function HospitalDashboard() {
   const statistics = {
     totalPatients: 300,
     totalInventoryValue: 50000,
-    totalOrders: 100, // Added total orders statistic
+    totalOrders: 100,
   };
   
   const profitLossData = {
@@ -76,24 +75,21 @@ export default function HospitalDashboard() {
           <Box>
             <Typography variant="h5">Inventory Management</Typography>
             <InventoryOverview />
-            
           </Box>
         );
       case 'orders':
         return (
           <Box>
             <Typography variant="h5">Order Management</Typography>
-            <NewOrderPage/>
-            <OrderListPage/>
-            {/* <p>Manage orders and track status here.</p> */}
+            <NewOrderPage />
+            <OrderListPage />
           </Box>
         );
       case 'shipments':
         return (
           <Box>
             <Typography variant="h5">Track Shipments</Typography>
-            <TrackShipmentPage/>
-            {/* <p>Manage and track shipments of medical supplies.</p> */}
+            <TrackShipmentPage />
           </Box>
         );
       case 'reports':
@@ -109,19 +105,19 @@ export default function HospitalDashboard() {
             <Typography variant="h4" sx={{ marginBottom: 2 }}>Overview</Typography>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6} md={4}>
-                <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
+                <Paper elevation={3} sx={{ padding: 2, textAlign: 'center', transition: '0.3s', '&:hover': { boxShadow: '0 8px 16px rgba(0,0,0,0.3)' } }}>
                   <Typography variant="h6">Total Patients</Typography>
                   <Typography variant="h4">{statistics.totalPatients}</Typography>
                 </Paper>
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
-                <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
+                <Paper elevation={3} sx={{ padding: 2, textAlign: 'center', transition: '0.3s', '&:hover': { boxShadow: '0 8px 16px rgba(0,0,0,0.3)' } }}>
                   <Typography variant="h6">Inventory Value</Typography>
                   <Typography variant="h4">${statistics.totalInventoryValue}</Typography>
                 </Paper>
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
-                <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
+                <Paper elevation={3} sx={{ padding: 2, textAlign: 'center', transition: '0.3s', '&:hover': { boxShadow: '0 8px 16px rgba(0,0,0,0.3)' } }}>
                   <Typography variant="h6">Total Orders</Typography>
                   <Typography variant="h4">{statistics.totalOrders}</Typography>
                 </Paper>
@@ -148,33 +144,35 @@ export default function HospitalDashboard() {
           '& .MuiDrawer-paper': {
             width: 240,
             boxSizing: 'border-box',
+            backgroundColor: '#3f51b5',
+            color: '#ffffff',
           },
         }}
       >
         <Toolbar />
         <List>
-          <ListItem button onClick={() => setSelectedSection('overview')}>
-            <ListItemIcon><Dashboard /></ListItemIcon>
+          <ListItem button onClick={() => setSelectedSection('overview')} sx={{ transition: '0.3s', '&:hover': { backgroundColor: '#5c6bc0' } }}>
+            <ListItemIcon sx={{ color: '#ffffff' }}><Dashboard /></ListItemIcon>
             <ListItemText primary="Dashboard Overview" />
           </ListItem>
-          <ListItem button onClick={() => setSelectedSection('inventory')}>
-            <ListItemIcon><Inventory /></ListItemIcon>
+          <ListItem button onClick={() => setSelectedSection('inventory')} sx={{ transition: '0.3s', '&:hover': { backgroundColor: '#5c6bc0' } }}>
+            <ListItemIcon sx={{ color: '#ffffff' }}><Inventory /></ListItemIcon>
             <ListItemText primary="Inventory Management" />
           </ListItem>
-          <ListItem button onClick={() => setSelectedSection('orders')}>
-            <ListItemIcon><Receipt /></ListItemIcon>
+          <ListItem button onClick={() => setSelectedSection('orders')} sx={{ transition: '0.3s', '&:hover': { backgroundColor: '#5c6bc0' } }}>
+            <ListItemIcon sx={{ color: '#ffffff' }}><Receipt /></ListItemIcon>
             <ListItemText primary="Order Management" />
           </ListItem>
-          <ListItem button onClick={() => setSelectedSection('shipments')}>
-            <ListItemIcon><Assessment /></ListItemIcon>
+          <ListItem button onClick={() => setSelectedSection('shipments')} sx={{ transition: '0.3s', '&:hover': { backgroundColor: '#5c6bc0' } }}>
+            <ListItemIcon sx={{ color: '#ffffff' }}><Assessment /></ListItemIcon>
             <ListItemText primary="Track Shipments" />
           </ListItem>
-          <ListItem button onClick={() => setSelectedSection('reports')}>
-            <ListItemIcon><AccountCircle /></ListItemIcon>
+          <ListItem button onClick={() => setSelectedSection('reports')} sx={{ transition: '0.3s', '&:hover': { backgroundColor: '#5c6bc0' } }}>
+            <ListItemIcon sx={{ color: '#ffffff' }}><AccountCircle /></ListItemIcon>
             <ListItemText primary="Reports" />
           </ListItem>
-          <ListItem button onClick={() => console.log('Logout')}>
-            <ListItemIcon><ExitToApp /></ListItemIcon>
+          <ListItem button onClick={() => console.log('Logout')} sx={{ transition: '0.3s', '&:hover': { backgroundColor: '#5c6bc0' } }}>
+            <ListItemIcon sx={{ color: '#ffffff' }}><ExitToApp /></ListItemIcon>
             <ListItemText primary="Logout" />
           </ListItem>
         </List>
@@ -183,16 +181,15 @@ export default function HospitalDashboard() {
       {/* Main Content Area */}
       <Container sx={{ flexGrow: 1, padding: 4 }}>
         {/* Top Bar */}
-        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: '#3f51b5' }}>
           <Toolbar>
-            {/* Logo and App Name positioned on the left */}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <img
-                src="src/assets/mm-logo.png" // Replace with your logo path
+                src={logo}
                 alt="Medimatrix Logo"
-                style={{ height: 40, marginRight: 10 }} // Adjust size as needed
+                style={{ height: 40, marginRight: 10 }}
               />
-              <Typography variant="h6" noWrap>
+              <Typography variant="h5" noWrap sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, letterSpacing: '1px' }}>
                 Medimatrix
               </Typography>
             </Box>

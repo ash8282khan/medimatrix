@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
-import { firestore } from '../../firebase'; 
+import { firestore } from '../../firebase';
+import * as XLSX from 'xlsx';
 import {
   Container,
   Card,
@@ -15,6 +16,7 @@ import {
   TableRow,
   Button,
   IconButton,
+  Box,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 
@@ -23,7 +25,7 @@ export default function InventoryOverview() {
   const medicinesCollectionRef = collection(firestore, "medicine_inventory");
   let counter = 1;
 
-  const navigate = useNavigate(); // React Router navigation hook
+  const navigate = useNavigate();
 
   // Fetch medicine data from Firestore
   const getTypes = useCallback(async () => {
@@ -49,47 +51,73 @@ export default function InventoryOverview() {
     navigate("/inventory/edit"); // Navigate to the update page
   };
 
+  // Export inventory data to Excel
+  const handleExportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(
+      medicines.map((medicine) => ({
+        Name: medicine.name,
+        Power: medicine.power,
+        Price: medicine.price,
+        Stock: medicine.stock,
+        "Expiry Date": medicine.expiryDate,
+      }))
+    );
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Medicine Inventory");
+
+    // Generate an Excel file and download it
+    XLSX.writeFile(workbook, "Medicine_Inventory.xlsx");
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
-      <Container>
-        <Typography variant="h4" gutterBottom>
+      <Container maxWidth="xl">
+        <Typography variant="h4" gutterBottom sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, color: '#3f51b5' }}>
           Medicine Inventory
         </Typography>
-        <Card>
+        <Card sx={{ boxShadow: 3 }}>
           <CardContent>
-            <Typography variant="h6" component="div" gutterBottom>
-              Inventory List
-              <Button
-                component={Link}
-                to="/inventory/add"
-                variant="contained"
-                color="primary"
-                sx={{ float: "right" }}
-              >
-                Add new Medicine
-              </Button>
-            </Typography>
-            <TableContainer>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+              <Typography variant="h6" component="div" sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}>
+                Inventory List
+              </Typography>
+              <Box>
+                <Button
+                  component={Link}
+                  to="/inventory/add"
+                  variant="contained"
+                  color="primary"
+                  sx={{ marginLeft: 2 }}
+                >
+                  Add New Medicine
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  sx={{ marginLeft: 2 }}
+                  onClick={handleExportToExcel}
+                >
+                  Export to Excel
+                </Button>
+              </Box>
+            </Box>
+            <TableContainer sx={{ boxShadow: 2 }}>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>#</TableCell>
-                    <TableCell>
-                      Medicine Name<sup>Power</sup>
-                    </TableCell>
-                    <TableCell>Medicine Price</TableCell>
-                    <TableCell>Stock</TableCell>
-                    <TableCell>Expiry Date</TableCell>
-                    <TableCell>Action</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>#</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Medicine Name<sup>Power</sup></TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Medicine Price</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Stock</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Expiry Date</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {medicines.map((medicine) => (
                     <TableRow key={medicine.id}>
                       <TableCell>{counter++}</TableCell>
-                      <TableCell>
-                        {medicine.name} <sup>{medicine.power}</sup>
-                      </TableCell>
+                      <TableCell>{medicine.name} <sup>{medicine.power}</sup></TableCell>
                       <TableCell>₹{medicine.price}</TableCell>
                       <TableCell>{medicine.stock}</TableCell>
                       <TableCell>{medicine.expiryDate}</TableCell>

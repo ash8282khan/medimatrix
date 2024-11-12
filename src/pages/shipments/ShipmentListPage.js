@@ -1,25 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Container, Typography, Grid, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { useShipments } from '../../contexts/ShipmentContext';
-import { useOrders } from '../../contexts/OrderContext';
 
 export default function ShipmentListPage() {
-  const { shipments, createShipmentFromOrder, updateShipmentStatus } = useShipments();
-  const { orders } = useOrders();
+  const { shipments, updateShipmentStatus } = useShipments();
   const [open, setOpen] = useState(false);
   const [selectedShipment, setSelectedShipment] = useState(null);
   const [newStatus, setNewStatus] = useState('');
 
-  useEffect(() => {
-    orders.forEach(order => {
-      if (!shipments.some(shipment => shipment.orderId === order.id)) {
-        createShipmentFromOrder(order);
-      }
-    });
-  }, [orders, shipments, createShipmentFromOrder]);
-
   const handleClickOpen = (shipment) => {
     setSelectedShipment(shipment);
+    setNewStatus(shipment.status);  // Set the current status as the default in the dialog
     setOpen(true);
   };
 
@@ -30,22 +21,58 @@ export default function ShipmentListPage() {
   };
 
   const handleUpdateStatus = async () => {
-    await updateShipmentStatus(selectedShipment.id, newStatus, selectedShipment.estimatedDelivery);
-    handleClose();
+    if (selectedShipment && newStatus) {
+      try {
+        // Call the function to update the status
+        await updateShipmentStatus(selectedShipment.id, newStatus, selectedShipment.estimatedDelivery);
+        handleClose();
+      } catch (error) {
+        console.error('Error updating shipment status:', error);
+      }
+    } else {
+      console.error('Please provide a new status');
+    }
   };
 
   return (
-    <Container>
-      <Typography variant="h4">Shipments</Typography>
+    <Container sx={{ padding: 4 }}>
+      <Typography variant="h4" sx={{ fontWeight: 600, marginBottom: 4 }}>Shipments</Typography>
       <Grid container spacing={3}>
         {shipments.map((shipment) => (
           <Grid item xs={12} sm={6} md={4} key={shipment.id}>
-            <Paper elevation={3} style={{ padding: '10px', marginBottom: '10px' }}>
-              <Typography variant="h6">Shipment ID: {shipment.id}</Typography>
-              <Typography>Order ID: {shipment.orderId}</Typography>
-              <Typography>Status: {shipment.status}</Typography>
-              <Typography>Estimated Delivery: {shipment.estimatedDelivery || "Not Available"}</Typography>
-              <Button variant="outlined" onClick={() => handleClickOpen(shipment)}>Update Status</Button>
+            <Paper
+              elevation={3}
+              sx={{
+                padding: 3,
+                backgroundColor: '#fff',
+                borderRadius: 2,
+                boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0px 6px 18px rgba(0, 0, 0, 0.2)',
+                  backgroundColor: '#f9f9f9',
+                },
+              }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: 500 }}>Shipment ID: {shipment.id}</Typography>
+              <Typography variant="body1">Order ID: {shipment.orderId}</Typography>
+              <Typography variant="body1" sx={{ fontWeight: 500 }}>Status: {shipment.status}</Typography>
+              <Typography variant="body2" sx={{ color: 'textSecondary' }}>
+                Estimated Delivery: {shipment.estimatedDelivery || "Not Available"}
+              </Typography>
+              <Button
+                variant="contained"
+                sx={{
+                  marginTop: 2,
+                  backgroundColor: '#1976d2',
+                  '&:hover': {
+                    backgroundColor: '#1565c0',
+                  },
+                }}
+                onClick={() => handleClickOpen(shipment)}
+              >
+                Update Status
+              </Button>
             </Paper>
           </Grid>
         ))}
@@ -63,6 +90,7 @@ export default function ShipmentListPage() {
             variant="outlined"
             value={newStatus}
             onChange={(e) => setNewStatus(e.target.value)}
+            sx={{ marginBottom: 2 }}
           />
           <TextField
             margin="dense"
@@ -76,8 +104,18 @@ export default function ShipmentListPage() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleUpdateStatus}>Update</Button>
+          <Button onClick={handleClose} sx={{ color: '#1976d2' }}>Cancel</Button>
+          <Button
+            onClick={handleUpdateStatus}
+            sx={{
+              backgroundColor: '#1976d2',
+              '&:hover': {
+                backgroundColor: '#1565c0',
+              },
+            }}
+          >
+            Update
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>

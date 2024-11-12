@@ -29,7 +29,8 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-// import ReportsOverviewPage from '../reports/ReportsOverviewPage';
+import logo from '../../assets/logo.png';
+import '@fontsource/poppins'; // Poppins font import
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
@@ -69,7 +70,6 @@ export default function AdminDashboard() {
         return (
           <Box>
             <Typography variant="h5">Reports</Typography>
-            {/* <ReportsOverviewPage/> */}
             <p>View sales and inventory reports here.</p>
           </Box>
         );
@@ -85,30 +85,27 @@ export default function AdminDashboard() {
           <Box>
             <Typography variant="h4" sx={{ marginBottom: 2 }}>Overview</Typography>
             <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
-                  <Typography variant="h6">Total Sales</Typography>
-                  <Typography variant="h4">${statistics.totalSales}</Typography>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
-                  <Typography variant="h6">Total Orders</Typography>
-                  <Typography variant="h4">{statistics.totalOrders}</Typography>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
-                  <Typography variant="h6">Total Users</Typography>
-                  <Typography variant="h4">{statistics.totalUsers}</Typography>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
-                  <Typography variant="h6">Inventory Value</Typography>
-                  <Typography variant="h4">${statistics.totalInventoryValue}</Typography>
-                </Paper>
-              </Grid>
+              {Object.entries(statistics).map(([key, value], index) => (
+                <Grid item xs={12} sm={6} md={3} key={key}>
+                  <Paper
+                    elevation={3}
+                    sx={{
+                      padding: 2,
+                      textAlign: 'center',
+                      transition: 'transform 0.3s ease-in-out',
+                      '&:hover': {
+                        transform: 'scale(1.05)',
+                        boxShadow: 6,
+                      },
+                    }}
+                  >
+                    <Typography variant="h6">
+                      {key.replace(/([A-Z])/g, ' $1')}
+                    </Typography>
+                    <Typography variant="h4">{key === 'totalSales' || key === 'totalInventoryValue' ? `$${value}` : value}</Typography>
+                  </Paper>
+                </Grid>
+              ))}
             </Grid>
             <Box sx={{ marginTop: 4 }}>
               <Typography variant="h5">Profit & Loss Summary</Typography>
@@ -130,45 +127,54 @@ export default function AdminDashboard() {
           '& .MuiDrawer-paper': {
             width: 240,
             boxSizing: 'border-box',
+            backgroundColor: '#3f51b5',
+            color: '#ffffff',
           },
         }}
       >
         <Toolbar />
         <List>
-          <ListItem button onClick={() => setSelectedSection('overview')}>
-            <ListItemIcon><Dashboard /></ListItemIcon>
-            <ListItemText primary="Dashboard Overview" />
-          </ListItem>
-          <ListItem button onClick={() => setSelectedSection('reports')}>
-            <ListItemIcon><Assessment /></ListItemIcon>
-            <ListItemText primary="Reports" />
-          </ListItem>
-          <ListItem button onClick={() => setSelectedSection('profile')}>
-            <ListItemIcon><AccountCircle /></ListItemIcon>
-            <ListItemText primary="Profile Management" />
-          </ListItem>
-          <ListItem button onClick={() => console.log('Logout')}>
-            <ListItemIcon><ExitToApp /></ListItemIcon>
-            <ListItemText primary="Logout" />
-          </ListItem>
+          {[
+            { text: 'Dashboard Overview', icon: <Dashboard />, section: 'overview' },
+            { text: 'Reports', icon: <Assessment />, section: 'reports' },
+            { text: 'Profile Management', icon: <AccountCircle />, section: 'profile' },
+            { text: 'Logout', icon: <ExitToApp />, section: 'logout' },
+          ].map((item, index) => (
+            <ListItem
+              button
+              key={item.text}
+              onClick={() => setSelectedSection(item.section)}
+              sx={{
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: '#ffffff' }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItem>
+          ))}
         </List>
       </Drawer>
 
       <Container sx={{ flexGrow: 1, padding: 4 }}>
-        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        {/* Top Bar */}
+        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: '#3f51b5' }}>
           <Toolbar>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <img
-                src="src/assets/mm-logo.png" // Replace with your logo path
+                src={logo}
                 alt="Medimatrix Logo"
-                style={{ height: 40, marginRight: 10 }} // Adjust size as needed
+                style={{ height: 40, marginRight: 10 }}
               />
-              <Typography variant="h6" noWrap>
+              <Typography variant="h5" noWrap sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, letterSpacing: '1px' }}>
                 Medimatrix
               </Typography>
             </Box>
           </Toolbar>
         </AppBar>
+
 
         <Toolbar />
         {renderContent()}
