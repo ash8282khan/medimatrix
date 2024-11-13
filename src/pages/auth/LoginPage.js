@@ -73,7 +73,7 @@ export default function LoginPage() {
     color: 'black',
   }}
 >
-  Medimatrix
+  MediMatrix
 </Typography>
 
           {error && <Typography color="error" align="center">{error}</Typography>}

@@ -80,7 +80,7 @@ export default function RegisterPage() {
     color: 'black',
   }}
 >
-  Medimatrix
+  MediMatrix
 </Typography>
 
           {error && <Typography color="error" align="center">{error}</Typography>}

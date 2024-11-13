@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
     color: 'red',
   }}
 >
-  Medimatrix
+  MediMatrix
 </Typography>
 
           {error && <Typography color="error" align="center">{error}</Typography>}
