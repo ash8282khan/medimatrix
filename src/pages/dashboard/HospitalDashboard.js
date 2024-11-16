@@ -21,7 +21,7 @@ import {
   AccountCircle,
   ExitToApp,
 } from '@mui/icons-material';
-import { Line } from 'react-chartjs-2';
+import { Line ,Bar ,Pie} from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -31,6 +31,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 import InventoryOverview from '../inventory/InventoryOverview';
 import OrderListPage from '../orders/OrderListPage';
 import NewOrderPage from '../orders/NewOrderPage';
@@ -41,6 +42,12 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip,
 
 export default function HospitalDashboard() {
   const [selectedSection, setSelectedSection] = useState('overview');
+  const navigate = useNavigate(); // Initialize navigate
+
+  const handleLogout = () => {
+    // Perform any additional logout actions here, like clearing session data
+    navigate('/'); // Redirect to the login page
+  };
 
   const statistics = {
     totalPatients: 300,
@@ -92,13 +99,188 @@ export default function HospitalDashboard() {
             <TrackShipmentPage />
           </Box>
         );
-      case 'reports':
-        return (
-          <Box>
-            <Typography variant="h5">Reports</Typography>
-            <p>View reports related to patient management and inventory.</p>
-          </Box>
-        );
+        case 'reports':
+          return (
+            <Box>
+              <Typography variant="h5" gutterBottom>
+                Reports & Analytics
+              </Typography>
+              <Grid container spacing={3}>
+                {/* Sales Report */}
+                <Grid item xs={12} md={6}>
+                  <Paper elevation={3} sx={{ padding: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Sales Performance
+                    </Typography>
+                    <Line
+                      data={{
+                        labels: ['January', 'February', 'March', 'April', 'May'],
+                        datasets: [
+                          {
+                            label: 'Sales (in $)',
+                            data: [12000, 15000, 10000, 20000, 18000],
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                          },
+                        ],
+                      }}
+                    />
+                  </Paper>
+                </Grid>
+        
+                {/* Purchase Report */}
+                <Grid item xs={12} md={6}>
+                  <Paper elevation={3} sx={{ padding: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Purchase Statistics
+                    </Typography>
+                    <Line
+                      data={{
+                        labels: ['January', 'February', 'March', 'April', 'May'],
+                        datasets: [
+                          {
+                            label: 'Purchases (in $)',
+                            data: [8000, 7000, 12000, 15000, 11000],
+                            backgroundColor: 'rgba(255, 159, 64, 0.5)',
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            borderWidth: 1,
+                          },
+                        ],
+                      }}
+                    />
+                  </Paper>
+                </Grid>
+        
+                {/* Vendor Performance */}
+                <Grid item xs={12} md={6}>
+                  <Paper elevation={3} sx={{ padding: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Vendor Performance
+                    </Typography>
+                    <Line
+                      data={{
+                        labels: ['Vendor A', 'Vendor B', 'Vendor C', 'Vendor D'],
+                        datasets: [
+                          {
+                            label: 'Order Fulfillment Rate (%)',
+                            data: [95, 80, 90, 85],
+                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                          },
+                        ],
+                      }}
+                    />
+                  </Paper>
+                </Grid>
+        
+                {/* Inventory Overview */}
+                <Grid item xs={12} md={6}>
+                  <Paper elevation={3} sx={{ padding: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Inventory Breakdown
+                    </Typography>
+                    <Line
+                      data={{
+                        labels: ['Drug A', 'Drug B', 'Drug C', 'Drug D'],
+                        datasets: [
+                          {
+                            label: 'Stock Levels',
+                            data: [120, 80, 45, 95],
+                            backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1,
+                          },
+                        ],
+                      }}
+                    />
+                  </Paper>
+                </Grid>
+        
+                {/* Pie Chart for Expense Breakdown */}
+                <Grid item xs={12} md={6}>
+                  <Paper elevation={3} sx={{ padding: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Expense Breakdown
+                    </Typography>
+                    <Pie
+                      data={{
+                        labels: ['Inventory', 'Staff Salaries', 'Utilities', 'Miscellaneous'],
+                        datasets: [
+                          {
+                            label: 'Expenses',
+                            data: [5000, 2000, 1500, 500],
+                            backgroundColor: [
+                              'rgba(255, 99, 132, 0.5)',
+                              'rgba(54, 162, 235, 0.5)',
+                              'rgba(255, 206, 86, 0.5)',
+                              'rgba(75, 192, 192, 0.5)',
+                            ],
+                          },
+                        ],
+                      }}
+                    />
+                  </Paper>
+                </Grid>
+        
+                {/* Shipment Reports */}
+                <Grid item xs={12} md={6}>
+                  <Paper elevation={3} sx={{ padding: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Shipment Performance
+                    </Typography>
+                    <Bar
+                      data={{
+                        labels: ['Delivered', 'In Transit', 'Delayed', 'Cancelled'],
+                        datasets: [
+                          {
+                            label: 'Shipment Status Count',
+                            data: [200, 50, 30, 20],
+                            backgroundColor: [
+                              'rgba(75, 192, 192, 0.7)',
+                              'rgba(54, 162, 235, 0.7)',
+                              'rgba(255, 206, 86, 0.7)',
+                              'rgba(255, 99, 132, 0.7)',
+                            ],
+                          },
+                        ],
+                      }}
+                      options={{
+                        plugins: {
+                          legend: { display: true },
+                        },
+                      }}
+                    />
+                  </Paper>
+                </Grid>
+        
+                {/* Average Delivery Time */}
+                <Grid item xs={12} md={6}>
+                  <Paper elevation={3} sx={{ padding: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Average Delivery Time (Days)
+                    </Typography>
+                    <Bar
+                      data={{
+                        labels: ['Vendor A', 'Vendor B', 'Vendor C', 'Vendor D'],
+                        datasets: [
+                          {
+                            label: 'Avg Delivery Time',
+                            data: [3, 5, 4, 6],
+                            backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1,
+                          },
+                        ],
+                      }}
+                    />
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Box>
+          );
+        
       default:
         return (
           <Box>
@@ -171,7 +353,7 @@ export default function HospitalDashboard() {
             <ListItemIcon sx={{ color: '#ffffff' }}><AccountCircle /></ListItemIcon>
             <ListItemText primary="Reports" />
           </ListItem>
-          <ListItem button onClick={() => console.log('Logout')} sx={{ transition: '0.3s', '&:hover': { backgroundColor: '#5c6bc0' } }}>
+          <ListItem button onClick={handleLogout} sx={{ transition: '0.3s', '&:hover': { backgroundColor: '#5c6bc0' } }}>
             <ListItemIcon sx={{ color: '#ffffff' }}><ExitToApp /></ListItemIcon>
             <ListItemText primary="Logout" />
           </ListItem>

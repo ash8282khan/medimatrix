@@ -4,16 +4,17 @@ import { firestore } from '../../firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { useAuth } from '../../contexts/AuthContext';
 import { useShipments } from '../../contexts/ShipmentContext';
-import { format } from 'date-fns'; // You can use date-fns for date formatting
+import { format } from 'date-fns'; 
+import * as XLSX from 'xlsx'; // Import xlsx library
 
 const VendorOrdersPage = () => {
-  const { currentUser } = useAuth(); // Get vendor ID from user context
+  const { currentUser } = useAuth();
   const vendorId = currentUser?.uid;
   const [vendorOrders, setVendorOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // For error handling
-  const [successMessage, setSuccessMessage] = useState(''); // For success notification
-  const { handleCreateShipment } = useShipments(); // Shipment creation function
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+  const { handleCreateShipment } = useShipments();
 
   useEffect(() => {
     const fetchVendorOrders = async () => {
@@ -24,7 +25,6 @@ const VendorOrdersPage = () => {
         const ordersSnapshot = await getDocs(ordersQuery);
         const filteredOrders = ordersSnapshot.docs
           .map(doc => ({ id: doc.id, ...doc.data() }));
-
         setVendorOrders(filteredOrders);
       } catch (error) {
         console.error("Error fetching vendor orders: ", error);
@@ -39,12 +39,29 @@ const VendorOrdersPage = () => {
 
   const handleCreateShipmentClick = async (order) => {
     try {
-      await handleCreateShipment(order); // Use the context method to create shipment
+      await handleCreateShipment(order);
       setSuccessMessage('Shipment successfully created!');
     } catch (error) {
       setError("Failed to create shipment");
       console.error("Error creating shipment: ", error);
     }
+  };
+
+  const exportToExcel = () => {
+    const formattedOrders = vendorOrders.map(order => ({
+      OrderID: order.id,
+      DrugName: order.drugName || "N/A",
+      Quantity: order.quantity || "N/A",
+      Status: order.status || "Pending",
+      OrderedAt: order.createdAt ? format(order.createdAt.toDate(), 'MM/dd/yyyy HH:mm') : "N/A"
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(formattedOrders);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Vendor Orders');
+
+    // Generate Excel file and trigger download
+    XLSX.writeFile(wb, 'Vendor_Orders.xlsx');
   };
 
   if (loading) {
@@ -60,6 +77,16 @@ const VendorOrdersPage = () => {
     <Container sx={{ padding: 4 }}>
       <Paper elevation={3} sx={{ padding: 4, borderRadius: 2, backgroundColor: '#f5f5f5' }}>
         <Typography variant="h4" sx={{ fontWeight: 600, marginBottom: 3 }}>Orders Received</Typography>
+        
+        {/* Export Button */}
+        <Button 
+          variant="contained" 
+          onClick={exportToExcel} 
+          sx={{ marginBottom: 3 }}
+        >
+          Export to Excel
+        </Button>
+
         {error && <Typography color="error" sx={{ marginBottom: 2 }}>{error}</Typography>}
         {vendorOrders.length > 0 ? (
           vendorOrders.map(order => (
@@ -86,7 +113,6 @@ const VendorOrdersPage = () => {
                 Ordered At:{" "}
                 {order.createdAt ? format(order.createdAt.toDate(), 'MM/dd/yyyy HH:mm') : "N/A"}
               </Typography>
-              {/* Add a button to create shipment */}
               {order.status === 'Pending' && (
                 <Button
                   variant="contained"
@@ -103,7 +129,6 @@ const VendorOrdersPage = () => {
         )}
       </Paper>
 
-      {/* Success Message */}
       {successMessage && (
         <Snackbar
           open={true}

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, CircularProgress, Paper } from '@mui/material';
+import { Container, Typography, CircularProgress, Paper, Button } from '@mui/material';
 import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot } from '@mui/lab';
 import { useShipments } from '../../contexts/ShipmentContext';
 import { useOrders } from '../../contexts/OrderContext';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 export default function TrackShipmentPage() {
   const { shipments } = useShipments();
@@ -43,11 +45,40 @@ export default function TrackShipmentPage() {
     return allStatuses.slice(0, allStatuses.indexOf(status) + 1);
   };
 
+  const exportToExcel = () => {
+    const shipmentData = shipmentDetails.map((shipment) => ({
+      ShipmentID: shipment.id,
+      OrderID: shipment.orderId,
+      DrugName: shipment.drugName,
+      VendorName: shipment.vendorName,
+      Status: shipment.status,
+      EstimatedDelivery: shipment.estimatedDelivery || 'Not Available',
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(shipmentData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Shipments');
+
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const data = new Blob([excelBuffer], { bookType: 'xlsx', type: 'application/octet-stream' });
+
+    saveAs(data, 'shipments.xlsx');
+  };
+
   return (
     <Container>
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, marginBottom: 2 }}>
         Shipment Tracking
       </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={exportToExcel}
+        sx={{ marginBottom: 3 }}
+      >
+        Export to Excel
+      </Button>
+
       {shipmentDetails.map((shipment) => (
         <Paper
           key={shipment.id}

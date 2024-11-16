@@ -85,7 +85,7 @@ export function ShipmentProvider({ children }) {
   return (
     <ShipmentContext.Provider value={{ shipments, handleCreateShipment, updateShipmentStatus, getShipmentById }}>
       {loading ? (
-        <div>Loading shipments...</div>
+        <div>  </div>
       ) : error ? (
         <div>Error: {error}</div>
       ) : (

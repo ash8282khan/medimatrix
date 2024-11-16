@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Typography, Grid, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { useShipments } from '../../contexts/ShipmentContext';
+import * as XLSX from 'xlsx'; // Import the xlsx library
 
 export default function ShipmentListPage() {
   const { shipments, updateShipmentStatus } = useShipments();
@@ -34,9 +35,33 @@ export default function ShipmentListPage() {
     }
   };
 
+  // Function to export shipments to Excel
+  const exportToExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(shipments); // Convert shipments to worksheet
+    const wb = XLSX.utils.book_new(); // Create a new workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Shipments'); // Append the sheet to the workbook
+    XLSX.writeFile(wb, 'shipments.xlsx'); // Download the file as 'shipments.xlsx'
+  };
+
   return (
     <Container sx={{ padding: 4 }}>
       <Typography variant="h4" sx={{ fontWeight: 600, marginBottom: 4 }}>Shipments</Typography>
+
+      {/* Export Button */}
+      <Button
+        variant="contained"
+        sx={{
+          marginBottom: 3,
+          backgroundColor: '#1976d2',
+          '&:hover': {
+            backgroundColor: '#1565c0',
+          },
+        }}
+        onClick={exportToExcel} // Trigger export on click
+      >
+        Export to Excel
+      </Button>
+
       <Grid container spacing={3}>
         {shipments.map((shipment) => (
           <Grid item xs={12} sm={6} md={4} key={shipment.id}>
