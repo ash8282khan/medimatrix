@@ -19,7 +19,7 @@ export function ShipmentProvider({ children }) {
       shipmentCollection,
       (snapshot) => {
         const shipmentsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log("Fetched Shipments:", shipmentsData);
+        // console.log("Fetched Shipments:", shipmentsData);
         setShipments(shipmentsData);
         setLoading(false); // Set loading to false once data is fetched
       },

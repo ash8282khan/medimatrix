@@ -1,125 +1,62 @@
-// import React, { useContext, useState, useEffect } from 'react';
-// import { auth } from '../firebase';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { auth } from '../firebase'; // Ensure Firebase is properly set up
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  createUserWithEmailAndPassword,
+} from 'firebase/auth';
 
-// const AuthContext = React.createContext();
+// Create the AuthContext
+const AuthContext = createContext();
 
-// export function useAuth() {
-//   return useContext(AuthContext);
-// }
+// Custom hook for using AuthContext
+export const useAuth = () => useContext(AuthContext);
 
-// export function AuthProvider({ children }) {
-//   const [currentUser, setCurrentUser] = useState(null);
-//   const [loading, setLoading] = useState(true);
-
-//   const signup = (email, password) => {
-//     return auth.createUserWithEmailAndPassword(email, password);
-//   };
-
-//   const login = (email, password) => {
-//     return auth.signInWithEmailAndPassword(email, password);
-//   };
-
-//   const logout = () => {
-//     return auth.signOut();
-//   };
-
-//   const resetPassword = (email) => {
-//     return auth.sendPasswordResetEmail(email);
-//   };
-
-//   const changePassword = (newPassword) => {
-//     return currentUser.updatePassword(newPassword);
-//   };
-
-//   const updateUserProfile = (data) => {
-//     return currentUser.updateProfile(data);
-//   };
-
-//   useEffect(() => {
-//     const unsubscribe = auth.onAuthStateChanged((user) => {
-//       setCurrentUser(user);
-//       setLoading(false);
-//     });
-//     return unsubscribe;
-//   }, []);
-
-//   const value = {
-//     currentUser,
-//     login,
-//     signup,
-//     logout,
-//     resetPassword,
-//     changePassword,
-//     updateUserProfile
-//   };
-
-//   return (
-//     <AuthContext.Provider value={value}>
-//       {!loading && children}
-//     </AuthContext.Provider>
-//   );
-// }
-
-
-import React, { useContext, useState, useEffect } from 'react';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updatePassword, updateProfile, onAuthStateChanged, signOut } from 'firebase/auth';
-
-const AuthContext = React.createContext();
-
-export function useAuth() {
-  return useContext(AuthContext);
-}
-
-export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const auth = getAuth(); // Get the Firebase auth instance
-
-  const signup = (email, password) => {
-    return createUserWithEmailAndPassword(auth, email, password); // Updated syntax
-  };
-
-  const login = (email, password) => {
-    return signInWithEmailAndPassword(auth, email, password); // Updated syntax
-  };
-
-  const logout = () => {
-    return signOut(auth); // Updated syntax
-  };
-
-  const resetPassword = (email) => {
-    return sendPasswordResetEmail(auth, email); // Updated syntax
-  };
-
-  const changePassword = (newPassword) => {
-    return updatePassword(currentUser, newPassword); // Updated syntax
-  };
-
-  const updateUserProfile = (data) => {
-    return updateProfile(currentUser, data); // Updated syntax
-  };
+// AuthProvider Component
+export const AuthProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null); // Store the currently logged-in user
+  const [loading, setLoading] = useState(true); // Track if auth state is being loaded
 
   useEffect(() => {
+    // Listen to auth state changes
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
-      setLoading(false);
+      setLoading(false); // Stop loading once user is determined
     });
-    return unsubscribe;
-  }, [auth]);
 
+    return unsubscribe; // Cleanup on unmount
+  }, []);
+
+  // Login function
+  const login = (email, password) => signInWithEmailAndPassword(auth, email, password);
+
+  // Register function
+  const register = (email, password) => createUserWithEmailAndPassword(auth, email, password);
+
+  // Logout function
+  const logout = () => signOut(auth);
+
+  // Update user profile
+  const updateProfile = (userData) => {
+    if (auth.currentUser) {
+      return auth.currentUser.updateProfile(userData);
+    }
+    return Promise.reject(new Error("No user is currently logged in"));
+  };
+
+  // Context value
   const value = {
     currentUser,
     login,
-    signup,
+    register,
     logout,
-    resetPassword,
-    changePassword,
-    updateUserProfile,
+    updateProfile,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {!loading && children} {/* Ensure no children are rendered during auth loading */}
     </AuthContext.Provider>
   );
-}
+};
